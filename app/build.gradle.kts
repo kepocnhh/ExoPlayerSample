@@ -57,4 +57,8 @@ androidComponents.onVariants { variant ->
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
+//    implementation("com.google.android.exoplayer:exoplayer:2.19.0")
+    implementation("androidx.media3:media3-exoplayer:1.1.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.1.0")
+    implementation("androidx.media3:media3-ui:1.1.0")
 }

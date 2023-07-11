@@ -1,6 +1,7 @@
 package test.android.ep
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
@@ -24,7 +25,10 @@ internal class MainActivity : AppCompatActivity() {
             showToast("Spec is wrong! $e")
             return
         }
-        // todo
+        val intent = Intent(this, ExoPlayerActivity::class.java).also {
+            it.putExtra("spec", spec)
+        }
+        startActivity(intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
