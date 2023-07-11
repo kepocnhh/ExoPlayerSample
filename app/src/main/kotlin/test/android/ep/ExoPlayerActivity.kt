@@ -7,8 +7,11 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
@@ -24,6 +27,34 @@ import androidx.media3.ui.PlayerView
 import java.net.URL
 
 internal class ExoPlayerActivity : AppCompatActivity() {
+    private var status: TextView? = null
+    private val listener = object : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            val flags = (0 until events.size()).map { index ->
+                events[index]
+            }
+            println("player: ${player.hashCode()}\nevents: $flags")
+        }
+
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            if (isLoading) {
+                checkNotNull(status).text = "loading"
+            }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+                checkNotNull(status).text = "playing"
+            } else {
+                checkNotNull(status).text = "paused"
+            }
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            println("on player error: $error")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = requireNotNull(intent)
@@ -56,9 +87,19 @@ internal class ExoPlayerActivity : AppCompatActivity() {
                 Gravity.CENTER_VERTICAL
             )
             it.player = player
+            root.addView(it)
+        }
+        status = TextView(context).also {
+            it.layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER_VERTICAL
+            )
+            root.addView(it)
         }
         setContentView(root)
         root.post {
+            player.addListener(listener)
             player.setMediaItem(mediaItem)
             player.prepare()
             player.play()
